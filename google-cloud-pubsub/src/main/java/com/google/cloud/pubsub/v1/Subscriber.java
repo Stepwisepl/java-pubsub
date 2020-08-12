@@ -348,7 +348,9 @@ public class Subscriber extends AbstractApiService implements SubscriberInterfac
             public void failed(State from, Throwable failure) {
               // If a connection failed is because of a fatal error, we should fail the
               // whole subscriber.
+              //this has no effect in our non-existing-subscription case
               stopAllStreamingConnections();
+              //this has no effect in our non-existing-subscription case
               shutdownBackgroundResources();
               try {
                 notifyFailed(failure);
@@ -364,6 +366,14 @@ public class Subscriber extends AbstractApiService implements SubscriberInterfac
   }
 
   private void stopAllStreamingConnections() {
+    //cleanup streamingSubscriberConnection, stops message dispatcher
+    for (StreamingSubscriberConnection streamingSubscriberConnection : streamingSubscriberConnections) {
+      streamingSubscriberConnection.doStopMessageDispatcher();
+    }
+
+    //close subStub "manually", stops Watchdog
+    subStub.shutdownNow();
+    //this has no effect in our non-existing-subscription case
     stopConnections(streamingSubscriberConnections);
   }
 

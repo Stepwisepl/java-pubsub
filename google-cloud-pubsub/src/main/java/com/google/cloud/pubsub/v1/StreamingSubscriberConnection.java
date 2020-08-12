@@ -129,7 +129,10 @@ final class StreamingSubscriberConnection extends AbstractApiService implements 
     notifyStarted();
   }
 
-  @Override
+  protected void doStopMessageDispatcher() {
+    messageDispatcher.stop();
+  }
+  
   protected void doStop() {
     messageDispatcher.stop();
     ackOperationsWaiter.waitComplete();
